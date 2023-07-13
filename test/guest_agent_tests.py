@@ -22,6 +22,26 @@ class TestAgentCommands(unittest.TestCase):
         res = GuestAgent.guest_sync(1234)
         self.assertEqual(expected, res)
 
+    def test_create_user_no_other_args(self):
+        self.assertFalse
+
+    def test_create_user_only_home(self):
+        self.assertFalse
+    
+    def test_create_user_only_one_group(self):
+        self.assertFalse
+    
+    def test_create_user_many_groups(self):
+        self.assertFalse
+
+    def test_create_user_group_and_home(self):
+        self.assertFalse
+
+    def test_get_osinfo(self):
+        self.assertFalse
+
+    def test_deploy_ssh_pubkey(self):
+        self.assertFalse
 
 if __name__ == '__main__':
     unittest.main()
