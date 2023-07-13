@@ -9,7 +9,7 @@ class GuestAgent:
         '''
         Calls the function associated with the qmp command provided. 
         Parses the QMP command to also input correct arguments to function.
-        If the command does not exist, raise an error.
+        If the command does not exist, raise" an error.
 
         '''
         raise NotImplementedError
