@@ -1,6 +1,8 @@
 import unittest
-from guest_agent import GuestAgent
 from qemu.qmp import Message
+import sys
+sys.path.insert(1, "../src/guest_agent")
+from guest_agent import GuestAgent
 
 class TestAgentMethods(unittest.TestCase):
 
