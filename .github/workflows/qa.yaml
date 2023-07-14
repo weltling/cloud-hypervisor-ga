@@ -20,7 +20,17 @@ jobs:
         run: |
           sudo apt update -y
           DEBIAN_FRONTEND=noninteractive sudo apt install -y \
-            python3-pytest flake8
+            python3-pip python3-pytest flake8
+      - name: pip
+        run: |
+          pip3 install qmp
+      - name: flake8 test
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 test --exit-zero --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 test --exit-zero --count --max-complexity=10 --max-line-length=127 --statistics
+      - run: pytest-3 -vvv test
       - name: flake8 misc
         run: |
           # stop the build if there are Python syntax errors or undefined names
