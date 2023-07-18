@@ -17,9 +17,9 @@ class GuestAgent:
         '''
         Return the number passed to the guest agent
         '''
-        raise NotImplementedError
+        return num
 
-    def create_user(username, groups=None, home=None):
+    def create_user(username, groups=None, create_home=False):
         '''
         Create a user with the provided username. If groups and home provided,
         include the user in those groups and with that home directory
