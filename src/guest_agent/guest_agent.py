@@ -1,45 +1,89 @@
+import os
+import platform
+
 class GuestAgent:
     def __init__(self):
         '''
         Initialize the guest agent to be in a listening state
         '''
-        raise NotImplementedError
+        self.state = 0
 
-    def execute_qmp(qmp_command):
+    def execute_qmp(self, qmp_command):
         '''
         Calls the function associated with the qmp command provided.
         Parses the QMP command to also input correct arguments to function.
         If the command does not exist, raise" an error.
         '''
-        raise NotImplementedError
+        ret = None
+        command = qmp_command['execute']
+        if 'arguments' in qmp_command:
+            arguments = qmp_command['arguments']
 
-    def guest_sync(num):
+        if command == "guest-sync":
+            ret = self.guest_sync(arguments["id"])
+        elif command == "create-user":
+            pass
+        elif command == "get-osinfo":
+            ret = self.get_osinfo()
+        elif command == "deploy-ssh-pubkey":
+            ret = self.deploy_ssh_pubkey(arguments["username"], arguments["ssh-key"])
+        else:
+            raise Exception("Command {} not recognized".format(command))
+        
+        return {'return': ret}
+
+    def guest_sync(self, num):
         '''
         Return the number passed to the guest agent
         '''
         return num
 
-    def create_user(username, groups=None, create_home=False):
+    def create_user(self, username, groups=None, create_home=False):
         '''
         Create a user with the provided username. If groups and home provided,
         include the user in those groups and with that home directory
         '''
         raise NotImplementedError
 
-    def get_osinfo():
+    def get_osinfo(self):
         '''
         gets info about the os on which the guest is running.
         Info includes kernel release, kernel version, machine, id and name.
         '''
-        raise NotImplementedError
+        info = platform.freedesktop_os_release()
+        uname_info = os.uname()
+        os_info = {}
+        os_info["kernel-release"] = uname_info.release
+        os_info["kernel-version"] = uname_info.version
+        os_info["machine"] = uname_info.machine
+        os_info["name"] = info["NAME"]
+        os_info["prtty-name"] = info["PRETTY_NAME"]
+        os_info["version"] = info["VERSION"]
+        os_info["version-id"] = info["VERSION_ID"]
 
-    def deploy_ssh_pubkey(username, ssh_key):
+        return os_info
+
+    def deploy_ssh_pubkey(self, username, ssh_key):
         '''
         add an authroized ssh key to a given user account
         '''
-        raise NotImplementedError
+        path = '/home/{}/.ssh/'.format(username)
+        if not os.path.exists(path):
+            os.makedirs(path)
 
-    def send_response(qmp_response):
+        filename = 'authorized_keys'
+        if not os.path.exists(os.path.join(path, filename)):
+            f = open(os.path.join(path, filename), 'w')
+        else:
+            f = open(os.path.join(path, filename), 'a')
+
+        f.write("\n" + ssh_key)
+
+
+        return 0
+
+
+    def send_response(self, qmp_response):
         '''
         send the response in qmp format back to the host VM
         '''
@@ -47,4 +91,4 @@ class GuestAgent:
 
 
 if __name__ == '__main__':
-    pass
+    GuestAgent()

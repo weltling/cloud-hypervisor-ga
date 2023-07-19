@@ -11,60 +11,68 @@ class TestAgentMethods(unittest.TestCase):
 
     # Test execute
     def test_execute_guest_sync(self):
+        ga = GuestAgent()
         input = {"execute": "guest-sync", "arguments": {"id": 1234}}
-        expected = {'result': GuestAgent.guest_sync(1234)}
-        res = GuestAgent.execute_qmp(input)
+        expected = {'return': ga.guest_sync(1234)}
+        res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
     def test_execute_create_user_no_other_args(self):
+        ga = GuestAgent()
         input = {"execute": "guest-sync", "arguments": {"id": 1234}}
-        expected = {'result': GuestAgent.guest_sync(1234)}
-        res = GuestAgent.execute_qmp(input)
+        expected = {'return': ga.guest_sync(1234)}
+        res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
     def test_execute_create_user_only_home(self):
+        ga = GuestAgent()
         user_name = "testtestuser"
         input = {"execute": "create-user", "arguments": {"username": user_name, "create-home": True}}
-        expected = {'result': GuestAgent.create_user(user_name, create_home=True)}
-        res = GuestAgent.execute_qmp(input)
+        expected = {'return': ga.create_user(user_name, create_home=True)}
+        res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
     def test_execute_create_user_only_one_group(self):
+        ga = GuestAgent()
         user_name = "testtestuser"
         user_group = "kvm"
         input = {"execute": "create-user", "arguments": {"username": user_name, "groups": user_group}}
-        expected = {'result': GuestAgent.create_user(user_name, groups=user_group)}
-        res = GuestAgent.execute_qmp(input)
+        expected = {'return': ga.create_user(user_name, groups=user_group)}
+        res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
     def test_execute_create_user_many_groups(self):
+        ga = GuestAgent()
         user_name = "testtestuser"
         user_group = ["kvm", "libvirt"]
         input = {"execute": "create-user", "arguments": {"username": user_name, "groups": user_group}}
-        expected = {'result': GuestAgent.create_user(user_name, groups=user_group)}
-        res = GuestAgent.execute_qmp(input)
+        expected = {'return': ga.create_user(user_name, groups=user_group)}
+        res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
     def test_execute_create_user_group_and_home(self):
+        ga = GuestAgent()
         user_name = "testtestuser"
         user_group = "kvm"
         input = {"execute": "create-user", "arguments": {"username": user_name, "groups": user_group, "create-home": True}}
-        expected = {'result': GuestAgent.create_user(user_name, groups=user_group, create_home=True)}
-        res = GuestAgent.execute_qmp(input)
+        expected = {'return': ga.create_user(user_name, groups=user_group, create_home=True)}
+        res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
     def test_execute_get_osinfo(self):
+        ga = GuestAgent()
         input = {'execute': "get-osinfo"}
-        result = GuestAgent.execute_qmp(input)
-        expected = {'result': GuestAgent.get_osinfo()}
+        result = ga.execute_qmp(input)
+        expected = {'return': ga.get_osinfo()}
         self.assertDictEqual(expected, result)
 
     def test_execute_deploy_ssh_pubkey(self):
+        ga = GuestAgent()
         ssh_key = "test ssk key"
         user_name = "anothertestuser"
         input = {'execute': "deploy-ssh-pubkey", "arguments": {"username": user_name, "ssh-key": ssh_key}}
-        result = GuestAgent.execute_qmp(input)
-        expected = {'result': GuestAgent.deploy_ssh_pubkey(user_name, ssh_key)}
+        result = ga.execute_qmp(input)
+        expected = {'return': ga.deploy_ssh_pubkey(user_name, ssh_key)}
         self.assertDictEqual(expected, result)
 
 
@@ -72,13 +80,15 @@ class TestAgentCommands(unittest.TestCase):
 
     # test guest-sync
     def test_guest_sync(self):
+        ga = GuestAgent()
         expected = 1234
-        res = GuestAgent.guest_sync(1234)
+        res = ga.guest_sync(1234)
         self.assertEqual(expected, res)
 
     def test_create_user_no_other_args(self):
+        ga = GuestAgent()
         user_name = "testuser"
-        GuestAgent.create_user(user_name)
+        ga.create_user(user_name)
 
         ps = subprocess.Popen(('less', '/etc/passwd'), stdout=subprocess.PIPE)
         try:
@@ -91,9 +101,10 @@ class TestAgentCommands(unittest.TestCase):
         self.assertEqual(output.decode()[:len(user_name)], user_name)
 
     def test_create_user_only_home(self):
+        ga = GuestAgent()
         user_name = "testuser"
         user_home = True
-        GuestAgent.create_user(user_name, create_home=user_home)
+        ga.create_user(user_name, create_home=user_home)
 
         ps = subprocess.Popen(('less', '/etc/passwd'), stdout=subprocess.PIPE)
         try:
@@ -114,18 +125,20 @@ class TestAgentCommands(unittest.TestCase):
         self.assertEqual(output.decode()[:len(user_name)], user_name)
 
     def test_create_user_only_one_group(self):
+        ga = GuestAgent()
         test_group = "testgroup"
         test_user = "testuser"
-        GuestAgent.create_user(test_user, groups=test_group)
+        ga.create_user(test_user, groups=test_group)
         ps = subprocess.Popen(('groups', test_user),
                               stdout=subprocess.PIPE).stdout.read()
         groups = set(ps.decode()[:-1].split()[2:])
         self.assertTrue(test_group in groups)
 
     def test_create_user_many_groups(self):
+        ga = GuestAgent()
         test_groups = ["testgroup", "anothergroup", "thirdgroup"]
         test_user = "testuser"
-        GuestAgent.create_user(test_user, groups=test_groups)
+        ga.create_user(test_user, groups=test_groups)
         ps = subprocess.Popen(('groups', test_user),
                               stdout=subprocess.PIPE).stdout.read()
         groups = set(ps.decode()[:-1].split()[2:])
@@ -133,10 +146,11 @@ class TestAgentCommands(unittest.TestCase):
             self.assertTrue(group in groups)
 
     def test_create_user_group_and_home(self):
+        ga = GuestAgent()
         test_groups = ["testgroup", "anothergroup", "thirdgroup"]
         test_user = "testuser"
         test_home = True
-        GuestAgent.create_user(test_user, create_home=test_home, groups=test_groups)
+        ga.create_user(test_user, create_home=test_home, groups=test_groups)
 
         # Find groups
         ps = subprocess.Popen(('groups', test_user),
@@ -155,6 +169,7 @@ class TestAgentCommands(unittest.TestCase):
             self.debug("Home directory not found")
 
     def test_get_osinfo(self):
+        ga = GuestAgent()
         info = platform.freedesktop_os_release()
         uname_info = os.uname()
         expected = {}
@@ -166,13 +181,14 @@ class TestAgentCommands(unittest.TestCase):
         expected["version"] = info["VERSION"]
         expected["version-id"] = info["VERSION_ID"]
 
-        result = GuestAgent.get_osinfo()
+        result = ga.get_osinfo()
         self.assertDictEqual(expected, result)
 
     def test_deploy_ssh_pubkey(self):
+        ga = GuestAgent()
         ssh_key = "ssh key test"
         ssh_user = "anothertestuser"
-        GuestAgent.deploy_ssh_pubkey(ssh_user, ssh_key)
+        ga.deploy_ssh_pubkey(ssh_user, ssh_key)
         f = open("/home/{}/.ssh/authorized_keys".format(ssh_user))
         self.assertTrue(ssh_key in f)
 
