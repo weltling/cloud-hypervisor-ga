@@ -6,7 +6,7 @@ class GuestAgent:
         '''
         Initialize the guest agent to be in a listening state
         '''
-        self.state = 0
+        self.command = None
 
     def execute_qmp(self, qmp_command):
         '''
@@ -16,13 +16,23 @@ class GuestAgent:
         '''
         ret = None
         command = qmp_command['execute']
+        self.command = command
         if 'arguments' in qmp_command:
             arguments = qmp_command['arguments']
 
         if command == "guest-sync":
             ret = self.guest_sync(arguments["id"])
         elif command == "create-user":
-            pass
+            if 'create-home' in arguments:
+                if 'groups' in arguments:
+                    ret = self.create_user(arguments['username'], groups=arguments['groups'], create_home=arguments['create-home'])
+                else:
+                    ret = self.create_user(arguments['username'], create_home=arguments['create-home'])
+            elif 'groups' in arguments:
+                ret = self.create_user(arguments['username'], groups=arguments['groups'])
+            else:
+                ret = self.create_user(arguments['username'])
+
         elif command == "get-osinfo":
             ret = self.get_osinfo()
         elif command == "deploy-ssh-pubkey":
@@ -43,8 +53,23 @@ class GuestAgent:
         Create a user with the provided username. If groups and home provided,
         include the user in those groups and with that home directory
         '''
-        raise NotImplementedError
-
+        ret_val = [False, False]
+        home = ""
+        groups_in = ""
+        if create_home:
+            home = "-m "
+            ret_val[0] = True
+        if groups is not None:
+            ret_val[1] = True
+            if isinstance(groups, list):
+                groups_in = "--groups " + ",".join(groups) + " "
+            elif isinstance(groups, str):
+                groups_in = "--groups {} ".format(groups)
+                
+        cmd = "useradd {}{}{}".format(home, groups_in, username)
+        os.system(cmd)
+        return ret_val
+    
     def get_osinfo(self):
         '''
         gets info about the os on which the guest is running.
@@ -79,9 +104,7 @@ class GuestAgent:
 
         f.write("\n" + ssh_key)
 
-
         return 0
-
 
     def send_response(self, qmp_response):
         '''

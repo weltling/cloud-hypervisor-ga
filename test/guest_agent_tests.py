@@ -98,7 +98,9 @@ class TestAgentCommands(unittest.TestCase):
             self.debug("User not found")
         ps.wait()
 
-        self.assertEqual(output.decode()[:len(user_name)], user_name)
+        matched_users = set(l[:len(user_name)] for l in output.decode().split())
+        self.assertTrue(user_name in matched_users)
+        os.system("sudo userdel -r testuser")
 
     def test_create_user_only_home(self):
         ga = GuestAgent()
@@ -122,21 +124,24 @@ class TestAgentCommands(unittest.TestCase):
         except subprocess.CalledProcessError:
             self.debug("User not found")
 
-        self.assertEqual(output.decode()[:len(user_name)], user_name)
+        matched_users = set(l[:len(user_name)] for l in output.decode().split())
+        self.assertTrue(user_name in matched_users)
+        os.system("sudo userdel -r testuser")
 
     def test_create_user_only_one_group(self):
         ga = GuestAgent()
-        test_group = "testgroup"
+        test_group = "libvirt"
         test_user = "testuser"
         ga.create_user(test_user, groups=test_group)
         ps = subprocess.Popen(('groups', test_user),
                               stdout=subprocess.PIPE).stdout.read()
         groups = set(ps.decode()[:-1].split()[2:])
         self.assertTrue(test_group in groups)
+        os.system("sudo userdel testuser")
 
     def test_create_user_many_groups(self):
         ga = GuestAgent()
-        test_groups = ["testgroup", "anothergroup", "thirdgroup"]
+        test_groups = ["libvirt", "kvm", "sambashare"]
         test_user = "testuser"
         ga.create_user(test_user, groups=test_groups)
         ps = subprocess.Popen(('groups', test_user),
@@ -144,10 +149,11 @@ class TestAgentCommands(unittest.TestCase):
         groups = set(ps.decode()[:-1].split()[2:])
         for group in test_groups:
             self.assertTrue(group in groups)
+        os.system("sudo userdel testuser")
 
     def test_create_user_group_and_home(self):
         ga = GuestAgent()
-        test_groups = ["testgroup", "anothergroup", "thirdgroup"]
+        test_groups = ["libvirt", "kvm", "sambashare"]
         test_user = "testuser"
         test_home = True
         ga.create_user(test_user, create_home=test_home, groups=test_groups)
@@ -167,6 +173,7 @@ class TestAgentCommands(unittest.TestCase):
             ps.wait()
         except subprocess.CalledProcessError:
             self.debug("Home directory not found")
+        os.system("sudo userdel testuser")
 
     def test_get_osinfo(self):
         ga = GuestAgent()
