@@ -1,5 +1,9 @@
 import os
 import platform
+import socket
+import struct
+import fcntl
+import json
 
 class GuestAgent:
     def __init__(self):
@@ -7,6 +11,37 @@ class GuestAgent:
         Initialize the guest agent to be in a listening state
         '''
         self.command = None
+        while True:
+            self.vsock_listener()
+
+    def vsock_listener(self):
+        with open("/dev/vsock", "rb") as fd:
+            r = fcntl.ioctl(fd, socket.IOCTL_VM_SOCKETS_GET_LOCAL_CID, "    ")
+            CID = struct.unpack("I", r)[0]
+
+
+        PORT = 1234
+
+        s = socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM)
+        s.settimeout(None)
+        s.bind((CID, PORT))
+        s.listen()
+
+        (conn, (remote_cid, remote_port)) = s.accept()
+        buf = None
+        while True:
+            buf = conn.recv(128)
+            if not buf:
+                break
+            print(buf)
+            buf = json.loads(buf.decode('utf-8'))
+            print("Received: \n{}".format(buf))
+            # print(type(buf))
+            break
+
+        response = str(self.execute_qmp(buf))
+        conn.send(response.encode())
+        conn.close()
 
     def execute_qmp(self, qmp_command):
         '''
@@ -102,7 +137,7 @@ class GuestAgent:
         else:
             f = open(os.path.join(path, filename), 'a')
 
-        f.write("\n" + ssh_key)
+        f.write("\n" + ssh_key + "\n")
 
         return 0
 
