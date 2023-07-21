@@ -24,6 +24,8 @@ jobs:
       - name: pip
         run: |
           pip3 install qmp
+      - run: pytest-3 -vvv test
+      - run: pytest-3 -vvv misc
       - name: flake8 src
         run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -36,12 +38,10 @@ jobs:
           flake8 test --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 test --count --max-complexity=10 --max-line-length=127 --statistics
-      - run: pytest-3 -vvv test
       - name: flake8 misc
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          flake8 misc --exit-zero --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 misc --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 misc --exit-zero --count --max-complexity=10 --max-line-length=127 --statistics
-      - run: pytest-3 -vvv misc
+          flake8 misc --count --max-complexity=10 --max-line-length=127 --statistics
 
