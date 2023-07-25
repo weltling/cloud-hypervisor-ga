@@ -20,12 +20,12 @@ jobs:
         run: |
           sudo apt update -y
           DEBIAN_FRONTEND=noninteractive sudo apt install -y \
-            python3-pip python3-pytest flake8
+            python3-pip flake8
       - name: pip
         run: |
-          pip3 install qmp
-      - run: pytest-3 -vvv test
-      - run: pytest-3 -vvv misc
+          pip3 install qmp pytest mock
+      - run: pytest -vvv test
+      - run: pytest -vvv misc
       - name: flake8 src
         run: |
           # stop the build if there are Python syntax errors or undefined names
