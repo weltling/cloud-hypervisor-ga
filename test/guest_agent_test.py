@@ -3,13 +3,21 @@ import sys
 import os
 import platform
 import subprocess
+from mock import patch
 sys.path.insert(1, sys.path[0] + "/../src/guest_agent")
 from guest_agent import GuestAgent # noqa E402
 
+def mock_vsock_listener(self):
+    pass
+
+def mock_init(self):
+        self.command = None
 
 class TestAgentMethods(unittest.TestCase):
 
     # Test execute
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_execute_guest_sync(self):
         ga = GuestAgent()
         input = {"execute": "guest-sync", "arguments": {"id": 1234}}
@@ -17,6 +25,8 @@ class TestAgentMethods(unittest.TestCase):
         res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_execute_create_user_no_other_args(self):
         ga = GuestAgent()
         input = {"execute": "guest-sync", "arguments": {"id": 1234}}
@@ -24,6 +34,8 @@ class TestAgentMethods(unittest.TestCase):
         res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_execute_create_user_only_home(self):
         ga = GuestAgent()
         user_name = "testtestuser"
@@ -32,6 +44,8 @@ class TestAgentMethods(unittest.TestCase):
         res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_execute_create_user_only_one_group(self):
         ga = GuestAgent()
         user_name = "testtestuser"
@@ -41,6 +55,8 @@ class TestAgentMethods(unittest.TestCase):
         res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_execute_create_user_many_groups(self):
         ga = GuestAgent()
         user_name = "testtestuser"
@@ -50,6 +66,8 @@ class TestAgentMethods(unittest.TestCase):
         res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_execute_create_user_group_and_home(self):
         ga = GuestAgent()
         user_name = "testtestuser"
@@ -59,6 +77,8 @@ class TestAgentMethods(unittest.TestCase):
         res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_execute_get_osinfo(self):
         ga = GuestAgent()
         input = {'execute': "get-osinfo"}
@@ -66,6 +86,8 @@ class TestAgentMethods(unittest.TestCase):
         expected = {'return': ga.get_osinfo()}
         self.assertDictEqual(expected, result)
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_execute_deploy_ssh_pubkey(self):
         ga = GuestAgent()
         ssh_key = "test ssk key"
@@ -79,12 +101,16 @@ class TestAgentMethods(unittest.TestCase):
 class TestAgentCommands(unittest.TestCase):
 
     # test guest-sync
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_guest_sync(self):
         ga = GuestAgent()
         expected = 1234
         res = ga.guest_sync(1234)
         self.assertEqual(expected, res)
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_create_user_no_other_args(self):
         ga = GuestAgent()
         user_name = "testuser"
@@ -102,6 +128,8 @@ class TestAgentCommands(unittest.TestCase):
         self.assertTrue(user_name in matched_users)
         os.system("sudo userdel -r testuser")
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_create_user_only_home(self):
         ga = GuestAgent()
         user_name = "testuser"
@@ -128,6 +156,8 @@ class TestAgentCommands(unittest.TestCase):
         self.assertTrue(user_name in matched_users)
         os.system("sudo userdel -r testuser")
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_create_user_only_one_group(self):
         ga = GuestAgent()
         test_group = "libvirt"
@@ -139,6 +169,8 @@ class TestAgentCommands(unittest.TestCase):
         self.assertTrue(test_group in groups)
         os.system("sudo userdel testuser")
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_create_user_many_groups(self):
         ga = GuestAgent()
         test_groups = ["libvirt", "kvm", "sambashare"]
@@ -151,6 +183,8 @@ class TestAgentCommands(unittest.TestCase):
             self.assertTrue(group in groups)
         os.system("sudo userdel testuser")
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_create_user_group_and_home(self):
         ga = GuestAgent()
         test_groups = ["libvirt", "kvm", "sambashare"]
@@ -175,6 +209,8 @@ class TestAgentCommands(unittest.TestCase):
             self.debug("Home directory not found")
         os.system("sudo userdel testuser")
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_get_osinfo(self):
         ga = GuestAgent()
         info = platform.freedesktop_os_release()
@@ -191,6 +227,8 @@ class TestAgentCommands(unittest.TestCase):
         result = ga.get_osinfo()
         self.assertDictEqual(expected, result)
 
+    @patch.object(GuestAgent, 'vsock_listener', mock_vsock_listener)
+    @patch.object(GuestAgent, '__init__', mock_init)
     def test_deploy_ssh_pubkey(self):
         ga = GuestAgent()
         ssh_key = "ssh key test"
