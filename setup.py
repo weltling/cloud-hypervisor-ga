@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="guest-agent",
     version="0.0.1",
-    author="Karissa Sanchez",
-    author_email="kasancehz519@gmail.com",
+    author="Karissa Sanchez, Anatol Belski",
+    author_email="kasanchez519@gmail.com, anbelski@microsoft.com",
     packages=["src/guest_agent", "test"],
     description="A guest agent for cloud hypervisor VMs",
     long_description=description,
