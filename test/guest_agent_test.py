@@ -1,11 +1,9 @@
 import unittest
-import sys
 import os
 import platform
 import subprocess
 from mock import patch
-sys.path.insert(1, sys.path[0] + "/../src/guest_agent")
-from guest_agent import GuestAgent # noqa E402
+from src.guest_agent.guest_agent import GuestAgent
 
 
 def mock_vsock_listener(self):
