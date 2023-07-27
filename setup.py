@@ -15,5 +15,10 @@ setuptools.setup(
     url="https://github.com/kasanchez519/ch-guest-agent.git",
     license='BSD-2-Clause',
     python_requires='>=3.8',
-    install_requires=[]
+    install_requires=[],
+    entry_points={
+        'console_scripts': [
+            'guest-agent = src.guest_agent.guest_agent:main',
+        ]
+    }
 )

@@ -150,8 +150,9 @@ class GuestAgent:
         '''
         raise NotImplementedError
 
-
-if __name__ == '__main__':
+def main():
     ga = GuestAgent()
     while True:
         ga.vsock_listener()
+if __name__ == '__main__':
+    main()
