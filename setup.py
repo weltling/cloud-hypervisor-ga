@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     description = fh.read()
   
 setuptools.setup(
-    name="guest-agent",
+    name="cloud-hypervisor-ga",
     version="0.0.1",
     author="Karissa Sanchez, Anatol Belski",
     author_email="kasanchez519@gmail.com, anbelski@microsoft.com",
@@ -18,7 +18,7 @@ setuptools.setup(
     install_requires=[],
     entry_points={
         'console_scripts': [
-            'guest-agent = src.guest_agent.guest_agent:main',
+            'cloud-hypervisor-ga = src.guest_agent.guest_agent:main',
         ]
     }
 )
