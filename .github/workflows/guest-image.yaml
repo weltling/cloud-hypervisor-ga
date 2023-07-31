@@ -1,0 +1,29 @@
+name: Guest Image
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' 
+      - name: apt
+        run: |
+          sudo apt update -y
+          DEBIAN_FRONTEND=noninteractive sudo apt install -y \
+            qemu-utils wget fdisk
+      - run: scripts/make_guest_img
+      - uses: actions/upload-artifact@v3
+        with:
+          name: jammy-server-cloudimg-amd64.raw
+          path: /tmp/jammy-server-cloudimg-amd64.raw
+

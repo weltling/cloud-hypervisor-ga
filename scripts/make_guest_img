@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -x
+
+SCRIPTS_DIR=$(realpath "$( dirname -- "${BASH_SOURCE[0]}" )")
+REPO_ROOT=$(realpath "${SCRIPTS_DIR}/../")
+
+IMG_BNAME=jammy-server-cloudimg-amd64
+IMG_BNAME_QCOW="${IMG_BNAME}.img"
+IMG_BNAME_RAW="${IMG_BNAME}.raw"
+IMG_PATH_QCOW="/tmp/${IMG_BNAME_QCOW}"
+IMG_PATH_RAW="/tmp/${IMG_BNAME_RAW}"
+
+rm -f "/tmp/${IMG_BNAME}".*
+wget "https://cloud-images.ubuntu.com/jammy/current/${IMG_BNAME_QCOW}" -O "${IMG_PATH_QCOW}"
+
+qemu-img convert -p -f qcow2 -O raw "${IMG_PATH_QCOW}" "${IMG_PATH_RAW}"
+
+OFFSET=$(sudo fdisk -o device,start,type -l "${IMG_PATH_RAW}" | grep "Linux filesystem" | cut -d' ' -f3)
+SECTOR_SIZE=$(sudo fdisk -o device,start,type -l "${IMG_PATH_RAW}" | grep "Sector size" | cut -d/ -f3 | cut -d' ' -f2)
+
+MOUNT_POINT=$(mktemp -d)
+sudo mount -o offset=$[${OFFSET}*${SECTOR_SIZE}] "${IMG_PATH_RAW}" "${MOUNT_POINT}"
+
+sudo cp -a "${REPO_ROOT}" "${MOUNT_POINT}/ga-repo"
+sudo cp "${REPO_ROOT}/asset/cloud-hypervisor-ga.service" "${MOUNT_POINT}/lib/systemd/system/"
+sudo mv "${MOUNT_POINT}/etc/resolv.conf" "${MOUNT_POINT}/etc/resolv.conf.bak" || true
+echo "nameserver 8.8.8.8" | sudo tee "${MOUNT_POINT}/etc/resolv.conf"
+
+_TMP0=$(mktemp)
+cat << EOF > "${_TMP0}"
+#!/bin/bash
+
+cd /ga-repo
+DEBIAN_FRONTEND=noninteractive apt update
+DEBIAN_FRONTEND=noninteractive apt install -y python3-pip
+DEBIAN_FRONTEND=noninteractive apt clean
+pip3 install --prefix /usr .
+systemctl enable cloud-hypervisor-ga.service
+rm -rf /root/.cache
+EOF
+sudo mv "${_TMP0}" "${MOUNT_POINT}/ga-install"
+sudo chmod +x "${MOUNT_POINT}/ga-install"
+
+sudo chroot "${MOUNT_POINT}" /ga-install
+
+sudo rm -rf "${MOUNT_POINT}/ga-repo"
+sudo rm "${MOUNT_POINT}/ga-install"
+
+sudo rm -f "${MOUNT_POINT}/etc/resolv.conf"
+sudo mv "${MOUNT_POINT}/etc/resolv.conf.bak" "${MOUNT_POINT}/etc/resolv.conf" || true
+
+sudo umount "${MOUNT_POINT}"
+
