@@ -28,13 +28,12 @@ class GuestAgent:
         (conn, (remote_cid, remote_port)) = s.accept()
         buf = None
         while True:
-            buf = conn.recv(128)
+            buf = conn.recv(4096)
             if not buf:
                 break
-            print(buf)
+
             buf = json.loads(buf.decode('utf-8'))
             print("Received: \n{}".format(buf))
-            # print(type(buf))
             break
 
         response = json.dumps(self.execute_qmp(buf))
@@ -143,12 +142,6 @@ class GuestAgent:
         f.write("\n" + ssh_key + "\n")
 
         return 0
-
-    def send_response(self, qmp_response):
-        '''
-        send the response in qmp format back to the host VM
-        '''
-        raise NotImplementedError
 
 
 def main():
