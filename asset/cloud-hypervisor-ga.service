@@ -1,0 +1,11 @@
+[Unit]
+Description=Cloud Hypervisor Guest Agent
+RequiresMountsFor=/usr
+
+[Service]
+ExecStart=/usr/local/bin/cloud-hypervisor-ga
+Restart=always
+RestartSec=0
+
+[Install]
+WantedBy=multi-user.target
