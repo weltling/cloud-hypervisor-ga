@@ -24,6 +24,7 @@ sudo mount -o offset=$[${OFFSET}*${SECTOR_SIZE}] "${IMG_PATH_RAW}" "${MOUNT_POIN
 
 sudo cp -a "${REPO_ROOT}" "${MOUNT_POINT}/ga-repo"
 sudo cp "${REPO_ROOT}/asset/cloud-hypervisor-ga.service" "${MOUNT_POINT}/lib/systemd/system/"
+sudo cp "${REPO_ROOT}/asset/00-ens.network" "${MOUNT_POINT}/etc/systemd/network/"
 sudo mv "${MOUNT_POINT}/etc/resolv.conf" "${MOUNT_POINT}/etc/resolv.conf.bak" || true
 echo "nameserver 8.8.8.8" | sudo tee "${MOUNT_POINT}/etc/resolv.conf"
 
