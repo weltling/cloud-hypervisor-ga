@@ -3,6 +3,7 @@ import argparse
 import qmp_formatter
 import json
 
+
 class TestParserMethods(unittest.TestCase):
 
     def test_no_args(self):
@@ -48,9 +49,14 @@ class TestParserMethods(unittest.TestCase):
         parser.add_argument('--cd')
         parser.add_argument('--ef')
         parser.add_argument('--gh')
-        namespace = parser.parse_args(['guest-sync', '--ab', '3', '--ef', '5', '--gh', '6'])
+        namespace = parser.parse_args(['guest-sync',
+                                       '--ab', '3',
+                                       '--ef', '5',
+                                       '--gh', '6'])
         result = qmp_formatter.to_qmp(namespace)
-        predicted = {"execute": "guest-sync", 'arguments': {'ab': '3', 'ef': '5', 'gh': '6'}}
+        predicted = {"execute": "guest-sync", 'arguments': {'ab': '3',
+                                                            'ef': '5',
+                                                            'gh': '6'}}
         self.assertDictEqual(json.loads(result), predicted)
 
 

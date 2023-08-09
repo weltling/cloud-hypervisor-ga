@@ -1,5 +1,6 @@
 import json
 
+
 def to_qmp(namespace):
     '''
     Converts a parsed Namespace to a QMP formatted dictionary
@@ -29,6 +30,6 @@ def to_qmp(namespace):
             elif 'arguments' not in result:
                 result["arguments"] = {name: value}
             else:
-                result["arguments"][name] =  value
+                result["arguments"][name] = value
 
     return json.dumps(result)

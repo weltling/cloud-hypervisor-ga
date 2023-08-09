@@ -1,5 +1,4 @@
 import socket
-import qmp_formatter
 from client_parser import build_parser
 
 cmd = build_parser()
