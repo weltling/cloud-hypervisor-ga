@@ -42,7 +42,7 @@ class TestAgentMethods(unittest.TestCase):
         user_name = "testtestuser"
         input = {"execute": "create-user",
                  "arguments": {"username": user_name,
-                               "create-home": True}}
+                               "create_home": True}}
         expected = {'return': ga.create_user(user_name, create_home=True)}
         res = ga.execute_qmp(input)
         self.assertDictEqual(expected, res)
@@ -82,7 +82,7 @@ class TestAgentMethods(unittest.TestCase):
         input = {"execute": "create-user",
                  "arguments": {"username": user_name,
                                "groups": user_group,
-                               "create-home": True}}
+                               "create_home": True}}
         expected = {'return':
                     ga.create_user(user_name,
                                    groups=user_group,
@@ -106,7 +106,7 @@ class TestAgentMethods(unittest.TestCase):
         ssh_key = "test ssk key"
         user_name = "anothertestuser"
         input = {'execute': "deploy-ssh-pubkey",
-                 "arguments": {"username": user_name, "ssh-key": ssh_key}}
+                 "arguments": {"username": user_name, "ssh_key": ssh_key}}
         result = ga.execute_qmp(input)
         expected = {'return': ga.deploy_ssh_pubkey(user_name, ssh_key)}
         self.assertDictEqual(expected, result)

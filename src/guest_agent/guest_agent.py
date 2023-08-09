@@ -55,14 +55,14 @@ class GuestAgent:
         if command == "guest-sync":
             ret = self.guest_sync(arguments["id"])
         elif command == "create-user":
-            if 'create-home' in arguments:
+            if 'create_home' in arguments:
                 if 'groups' in arguments:
                     ret = self.create_user(arguments['username'],
                                            groups=arguments['groups'],
-                                           create_home=arguments['create-home']) # noqa E501
+                                           create_home=arguments['create_home']) # noqa E501
                 else:
                     ret = self.create_user(arguments['username'],
-                                           create_home=arguments['create-home']) # noqa E501
+                                           create_home=arguments['create_home']) # noqa E501
             elif 'groups' in arguments:
                 ret = self.create_user(arguments['username'],
                                        groups=arguments['groups'])
@@ -73,7 +73,7 @@ class GuestAgent:
             ret = self.get_osinfo()
         elif command == "deploy-ssh-pubkey":
             ret = self.deploy_ssh_pubkey(arguments["username"],
-                                         arguments["ssh-key"])
+                                         arguments["ssh_key"])
         else:
             raise Exception("Command {} not recognized".format(command))
 
