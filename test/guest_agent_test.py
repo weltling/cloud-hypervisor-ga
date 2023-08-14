@@ -103,8 +103,8 @@ class TestAgentMethods(unittest.TestCase):
     @patch.object(GuestAgent, '__init__', mock_init)
     def test_execute_deploy_ssh_pubkey(self):
         ga = GuestAgent()
-        ssh_key = "test ssk key"
-        user_name = "anothertestuser"
+        ssh_key = "test ssh key"
+        user_name = "testtestuser"
         input = {'execute': "deploy-ssh-pubkey",
                  "arguments": {"username": user_name, "ssh_key": ssh_key}}
         result = ga.execute_qmp(input)
