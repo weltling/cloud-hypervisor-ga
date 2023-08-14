@@ -4,6 +4,7 @@ import socket
 import struct
 import fcntl
 import json
+import shutil
 
 
 class GuestAgent:
@@ -140,6 +141,11 @@ class GuestAgent:
             f = open(os.path.join(path, filename), 'a')
 
         f.write("\n" + ssh_key + "\n")
+
+        shutil.chown(path, user=username, group=username)
+        shutil.chown(os.path.join(path, filename),
+                     user=username,
+                     group=username)
 
         return 0
 
